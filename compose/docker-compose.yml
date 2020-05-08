@@ -1,0 +1,52 @@
+version: "3"
+services:
+  tbot:
+    build:
+      context: ../tbot
+      dockerfile: ./docker/Dockerfile
+    volumes:
+      - /opt/tbot:/opt/tbot
+      - /tmp/tbot:/tmp
+    depends_on:
+      - postgres
+    ports:
+      - "127.0.0.1:8080:8080"
+    environment:
+      POSTGRES_HOST: ${TBOT_POSTGRES:-postgres}
+      REDIS_HOST: ${REDIS_HOST:-redis}
+      VERIFY_SSL: "false"
+      UI_DOMAIN_NAME: ${UI_DOMAIN_NAME:-127.0.0.1}
+  postgres:
+    image: postgres:12.2-alpine
+    container_name: tbot_postgres
+    volumes:
+      - /opt/tbot/db:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_DB: "tbot"
+      POSTGRES_USER: "scott"
+      POSTGRES_PASSWORD: "MisiMisi!!"
+  redis:
+    image: redis:alpine
+    container_name: redis
+    ports: #debug
+      - "127.0.0.1:6379:6379"
+    logging:
+      driver: json-file
+      options:
+        max-size: 20M
+        max-file: "3"
+  daphne:
+    build: 
+      context: ../tbot
+      dockerfile: ./docker/Dockerfile-daphne
+    ports: #debug
+      - "127.0.0.1:8000:8000"
+    environment:
+      REDIS_HOST: ${REDIS_HOST:-redis}
+      UI_DOMAIN_NAME: ${UI_DOMAIN_NAME:-127.0.0.1}
+    depends_on:
+      - redis
+      - postgres
+volumes:
+  pcap:
+  db:
