@@ -48,5 +48,4 @@ services:
       - redis
       - postgres
 volumes:
-  pcap:
   db:
