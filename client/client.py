@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
 
-from .omrond6t import *
+import os
+import sys
+
+CURRENT_DIRECTORY = os.path.dirname( __file__ )
+sys.path.append( CURRENT_DIRECTORY )
+
+from omron6dt import *
 from pygame.locals import *
 #import picamera
 import pygame.camera
