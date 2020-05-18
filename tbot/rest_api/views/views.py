@@ -7,8 +7,12 @@ from rest_framework import viewsets
 from rest_framework.authentication import BasicAuthentication
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from knox.models import AuthToken
-from rest_api.serializers import UserSerializer
 from knox.views import LoginView as KnoxLoginView
+from rest_api.serializers import *
+from rest_api.models import *
+
+# Reference:
+# https://medium.com/technest/implement-user-auth-in-a-django-react-app-with-knox-fc56cdc9211c
 
 class UserAPIView(viewsets.ReadOnlyModelViewSet):
     queryset = User.objects.all()
@@ -19,7 +23,6 @@ class UserAPIView(viewsets.ReadOnlyModelViewSet):
 
     def get_object(self):
         return self.request.user
-
 
 class LoginView(KnoxLoginView):
     permission_classes = (permissions.AllowAny,)
@@ -32,3 +35,15 @@ class LoginView(KnoxLoginView):
         login(request, user)
         return super(LoginView, self).post(request, format=None)
 
+class ApplianceViewSet( viewsets.ModelViewSet ):
+    queryset = Appliance.objects.all()
+    serializer_class = ApplianceSerializer
+
+
+class TBotReadingViewSet( viewsets.ModelViewSet ):
+    queryset = TBotReading.objects.all()
+    serializer_class = TBotReadingSerializer
+
+class FaceViewSet( viewsets.ModelViewSet ):
+    queryset = Face.objects.all()
+    serializer_class = FaceSerializer

@@ -25,6 +25,17 @@ services:
       POSTGRES_DB: "tbot"
       POSTGRES_USER: "scott"
       POSTGRES_PASSWORD: "MisiMisi!!"
+  nginx:
+    build:
+      context: ../web/
+      dockerfile: ./Dockerfile
+    container_name: tbot_web
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - daphne      
   redis:
     image: redis:alpine
     container_name: redis

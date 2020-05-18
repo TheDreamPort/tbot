@@ -70,6 +70,7 @@ screen = pygame.display.set_mode([1280,720])
 try:
     while True:
         ret, cv_image = camera.read()
+        cv_image = cv2.flip( cv_image, 1 )
         screen.fill([0,0,0])
 
         #points = detect_eyes(cv_image, storage) + \

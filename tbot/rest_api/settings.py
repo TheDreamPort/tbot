@@ -32,7 +32,7 @@ IS_PRODUCTION = False
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['daphne', 'localhost', '127.0.0.1', '::1']
+ALLOWED_HOSTS = ['*']
 UI_DOMAIN = os.environ.get('UI_DOMAIN_NAME') or 'localhost'
 ALLOWED_HOSTS.append(UI_DOMAIN)
 
@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'drf_yasg',
     'constance',
+    'rest_api.apps.RestAPIConfig',
 ]
 
 MIDDLEWARE = [
@@ -137,7 +138,7 @@ if DEBUG:
 # when session remains active.
 REST_KNOX = {
     'TOKEN_TTL': datetime.timedelta(days=1),
-    'USER_SERIALIZER': 'packet_parser.serializers.UserSerializer',
+    'USER_SERIALIZER': 'rest_api.serializers.UserSerializer',
 }
 
 # Celery Settings
@@ -163,33 +164,8 @@ CELERY_WORKER_PREFETCH_MULTIPLIER = 1
 CELERY_WORKER_MAX_TASKS_PER_CHILD = 1000  # TODO: review this setting
 CELERY_WORKER_MAX_MEMORY_PER_CHILD = 350000  # 350 MB (value is in KB)
 
-# Scale worker pool up and down based on the following CPU load thresholds
-CELERY_WORKER_AUTOSCALER = 'rest_api.autoscaler.MinnowAutoScaler'
-MINNOW_AUTOSCALER_MIN_LOAD = 0.50    # Scale up if CPU load is lower than this number
-MINNOW_AUTOSCALER_MAX_LOAD = 0.75    # Scale down if CPU load is higher than this number
-
 BEAT_OS_MAINTENANCE_DELAY = 3600.0 # Every two seconds, do OS maintenance things
 CELERY_BEAT_SCHEDULE = {
-    'check_disk_usage': {
-        'task': 'packet_parser.scheduler.disk_usage',
-        'schedule': BEAT_OS_MAINTENANCE_DELAY,
-    },
-    'check_cpu_usage': {
-        'task': 'packet_parser.scheduler.cpu_usage',
-        'schedule': BEAT_OS_MAINTENANCE_DELAY,
-    },
-    'appliance-sysinfo': {
-        'task': 'integration.metrics.save_sysinfo',
-        'schedule': 25,
-    },    
-    'heartbeat': {
-        'task': 'integration.tasks.heartbeat',
-        'schedule': 45,
-    },
-    'send_data': {
-        'task': 'integration.tasks.send_data',
-        'schedule': 45,
-    },
 }
 
 # Database
@@ -276,14 +252,7 @@ CONSTANCE_BACKEND = 'constance.backends.redisd.RedisBackend'
 CONSTANCE_REDIS_CONNECTION = {
     'host': os.environ.get('REDIS_HOST') or 'redis',
     'port': 6379,
-    'db': 0,
-}
-
-CONSTANCE_ADDITIONAL_FIELDS = {
-    'interface_select': ['django.forms.fields.ChoiceField', {
-        'widget': 'django.forms.Select',
-        'choices': [ (x,x) for x in psutil.net_if_addrs().keys()],
-    }],
+    'db': 5,
 }
 
 CONSTANCE_CONFIG = {

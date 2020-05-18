@@ -29,9 +29,14 @@ from rest_framework.documentation import include_docs_urls
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 from knox import views as knox_views
-from rest_api.views.views import LoginView
+from rest_api.views.views import *
 
 router = routers.DefaultRouter(trailing_slash=False)
+
+router.register(r'appliance', ApplianceViewSet, 'Appliance')
+router.register(r'reading', TBotReadingViewSet, 'TBotReading')
+router.register(r'face', FaceViewSet, 'Face')
+
 
 # https://books.agiliq.com/projects/django-admin-cookbook/en/latest/change_text.html
 admin.site.site_header = "TBot Administration"
